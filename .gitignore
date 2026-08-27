@@ -1,0 +1,32 @@
+# Secret environment variables
+.env
+devops/environments/*/.env.*
+!.env.example
+!devops/environments/*/.env.*.example
+
+# Local Backups & Runtime Snapshots
+.backups/
+backups/
+devops/backups/
+
+# Local Desktop GUI Tools & Local Scripts (Not needed on Servers)
+scripts/gui_manager.py
+scripts/update_manager.py
+scripts/*.bat
+bin/
+*.exe
+
+# Python Cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+
+# IDE, OS & Temporary files
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+*.log
+

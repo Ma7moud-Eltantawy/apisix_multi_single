@@ -1,0 +1,110 @@
+#
+# Apache APISIX Configuration
+# ──────────────────────────────────────────────────────────
+# يشتغل مع Docker Compose — etcd بيتوصل بـ service name
+#
+
+apisix:
+  node_listen: 9080          # HTTP port
+  ssl:
+    enable: true
+    listen:
+      - port: 9443
+        enable_http3: false
+  enable_ipv6: false
+  enable_http2: true
+  enable_control: true
+  control:
+    ip: "0.0.0.0"
+    port: 9090
+
+deployment:
+  role: traditional
+  role_traditional:
+    config_provider: etcd
+  admin:
+    allow_admin:
+      - 0.0.0.0/0
+    admin_listen:
+      ip: 0.0.0.0
+      port: 9180
+    admin_key:
+      - name: "admin"
+        key: ${{ADMIN_KEY}}
+        role: admin
+      - name: "viewer"
+        key: 4054f7cf07e344346cd3f287985e76a2
+        role: viewer
+  etcd:
+    host:
+      - "http://etcd:2379"   # Docker service name
+    prefix: "/apisix"
+    timeout: 30
+
+plugin_attr:
+  prometheus:
+    export_uri: /apisix/prometheus/metrics
+    export_addr:
+      ip: "0.0.0.0"
+      port: 9091
+
+  server-info:
+    report_interval: 60
+
+plugins:
+  # Auth
+  - key-auth
+  - jwt-auth
+  - basic-auth
+  - hmac-auth
+  # Serverless
+  - serverless-pre-function
+  - serverless-post-function
+  # Traffic Control
+  - limit-req
+  - limit-count
+  - limit-conn
+  # Observability
+  - prometheus
+  - zipkin
+  - skywalking
+  - opentelemetry
+  - http-logger
+  - loki-logger
+  # Transforms
+  - proxy-rewrite
+  - response-rewrite
+  - grpc-transcode
+  - fault-injection
+  # Security
+  - cors
+  - ip-restriction
+  - ua-restriction
+  - referer-restriction
+  # General
+  - redirect
+  - echo
+  - gzip
+  - real-ip
+  - request-id
+
+nginx_config:
+  error_log_level: warn
+  worker_processes: auto
+  worker_connections: 10620
+  http_admin_configuration: |
+    location = / {
+        return 302 /ui/services;
+    }
+    location = /ui/ {
+        return 302 /ui/services;
+    }
+  http:
+    access_log_format: >-
+      "$remote_addr - $remote_user [$time_local] $http_host \"$request\"
+      $status $body_bytes_sent $request_time \"$http_referer\"
+      \"$http_user_agent\" $upstream_addr $upstream_status
+      $upstream_response_time \"$upstream_scheme://$upstream_host$upstream_uri\""
+    keepalive_timeout: 60s
+    client_max_body_size: 100m
+    real_ip_header: X-Real-IP

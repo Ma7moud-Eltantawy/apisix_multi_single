@@ -1,0 +1,116 @@
+name: qyadati-apisix-staging
+version: 1.0.0
+routes:
+- name: staging-health-check
+  uri: /health
+  methods:
+  - GET
+  plugins:
+    response-rewrite:
+      body: '{"status":"healthy","service":"qyadati-gateway","env":"staging","flavor":"uat"}'
+      headers:
+        set:
+          Content-Type: application/json
+- name: staging-api-docs
+  uri: /docs*
+  methods:
+  - GET
+  upstream:
+    name: staging-swagger-upstream
+    type: roundrobin
+    nodes:
+    - host: staging-docs.qyadati.internal
+      port: 3000
+      weight: 1
+- name: staging-auth-service
+  uri: /api/v1/auth/*
+  methods:
+  - GET
+  - POST
+  - PUT
+  - DELETE
+  - OPTIONS
+  plugins:
+    cors:
+      allow_origins: https://staging.qyadati.com,https://app-staging.qyadati.com
+      allow_methods: GET,POST,PUT,DELETE,OPTIONS
+      allow_headers: '*'
+      allow_credentials: true
+  upstream:
+    name: staging-auth-upstream
+    type: roundrobin
+    nodes:
+    - host: staging-auth.qyadati.internal
+      port: 4000
+      weight: 1
+- name: staging-users-service
+  uri: /api/v1/users/*
+  methods:
+  - GET
+  - POST
+  - PUT
+  - DELETE
+  - OPTIONS
+  plugins:
+    cors:
+      allow_origins: https://staging.qyadati.com,https://app-staging.qyadati.com
+      allow_methods: GET,POST,PUT,DELETE,OPTIONS
+      allow_headers: '*'
+      allow_credentials: true
+  upstream:
+    name: staging-users-upstream
+    type: roundrobin
+    nodes:
+    - host: staging-users.qyadati.internal
+      port: 4001
+      weight: 1
+- name: staging-payments-service
+  uri: /api/v1/payments/*
+  methods:
+  - GET
+  - POST
+  - PUT
+  - DELETE
+  - OPTIONS
+  plugins:
+    cors:
+      allow_origins: https://staging.qyadati.com,https://app-staging.qyadati.com
+      allow_methods: GET,POST,PUT,DELETE,OPTIONS
+      allow_headers: '*'
+      allow_credentials: true
+  upstream:
+    name: staging-payments-upstream
+    type: roundrobin
+    nodes:
+    - host: staging-payments.qyadati.internal
+      port: 4002
+      weight: 1
+- name: staging-courses-service
+  uri: /api/v1/courses/*
+  methods:
+  - GET
+  - POST
+  - PUT
+  - DELETE
+  - OPTIONS
+  plugins:
+    cors:
+      allow_origins: https://staging.qyadati.com,https://app-staging.qyadati.com
+      allow_methods: GET,POST,PUT,DELETE,OPTIONS
+      allow_headers: '*'
+      allow_credentials: true
+  upstream:
+    name: staging-courses-upstream
+    type: roundrobin
+    nodes:
+    - host: staging-courses.qyadati.internal
+      port: 4003
+      weight: 1
+services: []
+upstreams:
+- id: لابيلابلاب
+  name: لابيلابلابلالا
+  type: roundrobin
+  nodes:
+    host.docker.internal:3001: 1
+global_rules: []

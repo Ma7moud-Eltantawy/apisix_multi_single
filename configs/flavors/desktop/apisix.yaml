@@ -1,0 +1,107 @@
+name: qyadati-apisix-desktop
+version: 1.0.0
+routes:
+- name: desktop-health-check
+  uri: /health
+  methods:
+  - GET
+  plugins:
+    response-rewrite:
+      body: '{"status":"healthy","service":"qyadati-gateway","env":"desktop","flavor":"workstation"}'
+      headers:
+        set:
+          Content-Type: application/json
+- name: desktop-api-docs
+  uri: /docs*
+  methods:
+  - GET
+  upstream:
+    name: desktop-swagger-upstream
+    type: roundrobin
+    nodes:
+    - host: host.docker.internal
+      port: 3000
+      weight: 1
+- name: desktop-auth-service
+  uri: /api/v1/auth/*
+  methods:
+  - GET
+  - POST
+  - PUT
+  - DELETE
+  - OPTIONS
+  plugins:
+    cors:
+      allow_origins: '*'
+      allow_methods: '*'
+      allow_headers: '*'
+  upstream:
+    name: desktop-auth-upstream
+    type: roundrobin
+    nodes:
+    - host: host.docker.internal
+      port: 4000
+      weight: 1
+- name: desktop-users-service
+  uri: /api/v1/users/*
+  methods:
+  - GET
+  - POST
+  - PUT
+  - DELETE
+  - OPTIONS
+  plugins:
+    cors:
+      allow_origins: '*'
+      allow_methods: '*'
+      allow_headers: '*'
+  upstream:
+    name: desktop-users-upstream
+    type: roundrobin
+    nodes:
+    - host: host.docker.internal
+      port: 4001
+      weight: 1
+- name: desktop-payments-service
+  uri: /api/v1/payments/*
+  methods:
+  - GET
+  - POST
+  - PUT
+  - DELETE
+  - OPTIONS
+  plugins:
+    cors:
+      allow_origins: '*'
+      allow_methods: '*'
+      allow_headers: '*'
+  upstream:
+    name: desktop-payments-upstream
+    type: roundrobin
+    nodes:
+    - host: host.docker.internal
+      port: 4002
+      weight: 1
+- name: desktop-courses-service
+  uri: /api/v1/courses/*
+  methods:
+  - GET
+  - POST
+  - PUT
+  - DELETE
+  - OPTIONS
+  plugins:
+    cors:
+      allow_origins: '*'
+      allow_methods: '*'
+      allow_headers: '*'
+  upstream:
+    name: desktop-courses-upstream
+    type: roundrobin
+    nodes:
+    - host: host.docker.internal
+      port: 4003
+      weight: 1
+services: []
+upstreams: []
+global_rules: []

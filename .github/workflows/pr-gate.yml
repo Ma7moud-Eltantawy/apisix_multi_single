@@ -1,0 +1,58 @@
+name: 🛡️ Multi-Flavor PR Gate (ADC Validation)
+
+# =============================================================================
+# 📋 MULTI-FLAVOR PR GATE:
+# -----------------------------------------------------------------------------
+# - Runs on any Pull Request targeting `main`.
+# - Validates all 5 flavor environments in parallel:
+#   1. desktop (Personal Laptop / Docker Desktop)
+#   2. local (Office LAN / On-Premise)
+#   3. dev (Shared Cloud Dev Server)
+#   4. staging (QA / UAT Integration)
+#   5. prod (AWS Production VPC)
+# - Blocks merge if any configuration errors are detected.
+# =============================================================================
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'configs/**'
+      - 'apisix/**'
+      - '.github/workflows/**'
+
+jobs:
+  validate-all-flavors:
+    name: 🔍 ADC Validate (${{ matrix.flavor }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        flavor: [desktop, local, dev, staging, prod]
+    steps:
+      - name: 📥 Checkout Code
+        uses: actions/checkout@v4
+
+      - name: 🛠️ Setup ADC (APISIX Declarative CLI)
+        run: |
+          echo "Installing official API7 ADC binary..."
+          ADC_VERSION="v0.9.0"
+          curl -sSL "https://github.com/api7/adc/releases/download/${ADC_VERSION}/adc_${ADC_VERSION#v}_linux_amd64.tar.gz" -o adc.tar.gz
+          tar -xzf adc.tar.gz
+          sudo mv adc /usr/local/bin/
+          adc version
+
+      - name: 🧪 Validate Flavor Syntax & Schema (${{ matrix.flavor }})
+        run: |
+          CONFIG_FILE="configs/flavors/${{ matrix.flavor }}/apisix.yaml"
+          echo "============================================================"
+          echo "🔍 Running: adc validate -f $CONFIG_FILE"
+          echo "============================================================"
+          if [ -f "$CONFIG_FILE" ]; then
+            adc validate -f "$CONFIG_FILE"
+            echo "✅ Flavor [${{ matrix.flavor }}] Validation Passed Successfully!"
+          else
+            echo "❌ Error: Configuration file $CONFIG_FILE not found!"
+            exit 1
+          fi

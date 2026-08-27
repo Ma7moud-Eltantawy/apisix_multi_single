@@ -1,0 +1,19 @@
+# ============================================================
+#  APISIX Standalone Dashboard Configuration (Port 9010)
+# ============================================================
+
+conf:
+  listen:
+    host: 0.0.0.0
+    port: 9000
+
+  etcd:
+    endpoints:
+      - etcd:2379
+
+authentication:
+  secret: secret
+  expire_time: 3600
+  users:
+    - username: "$DASHBOARD_USER"
+      password: "$DASHBOARD_PASS"
