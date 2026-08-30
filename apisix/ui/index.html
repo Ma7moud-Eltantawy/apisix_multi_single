@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <script>
+      // Auto-set default Admin Key in localStorage if not set to prevent 401 redirect to /user/login
+      if (!localStorage.getItem('token')) {
+        localStorage.setItem('token', 'edd1c9f034335f136f87ad84b625c8f1');
+      }
+      if (window.location.pathname === '/ui/' || window.location.pathname === '/ui' || window.location.pathname === '/') {
+        window.location.replace('/ui/services');
+      }
+    </script>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/ui/assets/apisix-logo-HMKlWzJ1.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Apache APISIX Dashboard</title>
+    <script type="module" crossorigin src="/ui/assets/index-Z24RfHij.js"></script>
+    <link rel="modulepreload" crossorigin href="/ui/assets/antd-vendor-BeU9F222.js">
+    <link rel="modulepreload" crossorigin href="/ui/assets/monaco-editor-vendor-DXIttEOv.js">
+    <link rel="stylesheet" crossorigin href="/ui/assets/monaco-editor-vendor-CUMOsoFg.css">
+    <link rel="stylesheet" crossorigin href="/ui/assets/index-BcafYlUF.css">
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>
