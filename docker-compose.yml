@@ -41,7 +41,7 @@ services:
       retries: 10
       start_period: 15s
 
-  # -- 2. APISIX (Gateway + Admin API + /ui/ Dashboard) -------
+  # -- 2. APISIX Gateway Core --------------------------------
   apisix:
     image: ${APISIX_IMAGE:-apache/apisix:latest}
     container_name: ${CONTAINER_PREFIX:-qyadati-apisix}-gateway
@@ -55,11 +55,10 @@ services:
         condition: service_healthy
     volumes:
       - ./apisix/config.yaml:/usr/local/apisix/conf/config.yaml
-      - ./apisix/ui/index.html:/usr/local/apisix/ui/index.html
     ports:
       - "${APISIX_HTTP_PORT:-9280}:9080"   # HTTP Gateway (Data Plane)
       - "${APISIX_HTTPS_PORT:-9444}:9443"   # HTTPS Gateway
-      - "${APISIX_ADMIN_PORT:-9181}:9180"   # Admin API + /ui/ Dashboard
+      - "${APISIX_ADMIN_PORT:-9181}:9180"   # Admin REST API
     healthcheck:
       test: ["CMD", "bash", "-c", "exec 3<>/dev/tcp/127.0.0.1/9080"]
       interval: 15s
@@ -67,7 +66,7 @@ services:
       retries: 8
       start_period: 20s
 
-  # -- 3. APISIX Classic Dashboard (Port 9012/9000) -----------
+  # -- 3. Official Apache APISIX Dashboard (Port 9012) -------
   apisix-dashboard:
     image: ${DASHBOARD_IMAGE:-apache/apisix-dashboard:latest}
     container_name: ${CONTAINER_PREFIX:-qyadati-apisix}-dashboard
@@ -86,11 +85,11 @@ services:
       - |
         awk '{u=ENVIRON["DASHBOARD_USER"]?ENVIRON["DASHBOARD_USER"]:"admin"; p=ENVIRON["DASHBOARD_PASS"]?ENVIRON["DASHBOARD_PASS"]:"AdminQyadati2026"; gsub(/\$$DASHBOARD_USER/, u); gsub(/\$$DASHBOARD_PASS/, p); print}' /usr/local/apisix-dashboard/conf/conf.yaml.template > /usr/local/apisix-dashboard/conf/conf.yaml && exec ./manager-api
     ports:
-      - "${CLASSIC_DASHBOARD_PORT:-9022}:9000"
+      - "${CLASSIC_DASHBOARD_PORT:-9012}:9000"
     volumes:
       - ./dashboard/conf.yaml:/usr/local/apisix-dashboard/conf/conf.yaml.template:ro
 
-  # -- 4. APISIX Unified Admin Proxy (Port 9012 - Unified Host Entry) -------
+  # -- 4. APISIX Unified Admin Proxy (Port 9013) --------------
   admin-proxy:
     image: ${ADMIN_PROXY_IMAGE:-nginx:alpine}
     container_name: ${CONTAINER_PREFIX:-qyadati-apisix}-admin-proxy
@@ -102,6 +101,5 @@ services:
       - apisix-dashboard
     volumes:
       - ./nginx/admin-proxy.conf:/etc/nginx/conf.d/default.conf:ro
-      - ./apisix/ui:/usr/share/nginx/html/ui:ro
     ports:
-      - "${ADMIN_PROXY_PORT:-9012}:9180"   # Unified Entry: / (Classic) & /ui/ (API-Key Console) & /apisix/admin/
+      - "${ADMIN_PROXY_PORT:-9013}:9180"   # Unified Proxy
