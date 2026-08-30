@@ -102,5 +102,6 @@ services:
       - apisix-dashboard
     volumes:
       - ./nginx/admin-proxy.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./apisix/ui:/usr/share/nginx/html/ui:ro
     ports:
-      - "${ADMIN_PROXY_PORT:-9013}:9180"   # Unified Control Plane (Classic UI + /adminpanel/ + Admin API)
+      - "${ADMIN_PROXY_PORT:-9013}:9180"   # Unified Control Plane (Classic UI on / + API-Key UI on /ui/ + Admin API)
