@@ -2,10 +2,17 @@
 <html lang="en">
   <head>
     <script>
-      // Auto-set default Admin Key in localStorage if not set to prevent 401 redirect to /user/login
-      if (!localStorage.getItem('token')) {
-        localStorage.setItem('token', 'edd1c9f034335f136f87ad84b625c8f1');
-      }
+      const defaultKey = 'edd1c9f034335f136f87ad84b625c8f1';
+      // Auto-set Admin Key in localStorage for Mantine/Jotai settings:adminKey and token
+      try {
+        if (!localStorage.getItem('settings:adminKey') || localStorage.getItem('settings:adminKey') === '""') {
+          localStorage.setItem('settings:adminKey', JSON.stringify(defaultKey));
+        }
+        if (!localStorage.getItem('token')) {
+          localStorage.setItem('token', defaultKey);
+        }
+      } catch (e) {}
+
       if (window.location.pathname === '/ui/' || window.location.pathname === '/ui' || window.location.pathname === '/') {
         window.location.replace('/ui/services');
       }
