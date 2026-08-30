@@ -55,7 +55,6 @@ services:
         condition: service_healthy
     volumes:
       - ./apisix/config.yaml:/usr/local/apisix/conf/config.yaml
-      - ./apisix/ui/index.html:/usr/local/apisix/ui/index.html
     ports:
       - "${APISIX_HTTP_PORT:-9280}:9080"   # HTTP Gateway (Data Plane)
       - "${APISIX_HTTPS_PORT:-9444}:9443"   # HTTPS Gateway
