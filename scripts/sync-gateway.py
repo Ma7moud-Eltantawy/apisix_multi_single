@@ -84,15 +84,7 @@ def load_env_file():
 
 load_env_file()
 
-SINGLE_CONFIG = PROJECT_ROOT / "configs" / "apisix.yaml"
-
 FLAVORS = {
-    "single": {
-        "name": "🎯 Single-Flavor (Unified configs/apisix.yaml)",
-        "config": SINGLE_CONFIG,
-        "url": os.getenv("APISIX_ADMIN_URL", "http://localhost:9181"),
-        "token": os.getenv("ADMIN_KEY", "edd1c9f034335f136f87ad84b625c8f1")
-    },
     "desktop": {
         "name": "💻 Desktop (Personal Laptop / Docker Desktop)",
         "config": PROJECT_ROOT / "configs" / "flavors" / "desktop" / "apisix.yaml",
